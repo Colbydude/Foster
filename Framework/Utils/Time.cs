@@ -71,6 +71,20 @@ namespace Foster.Framework
         public static int FPS { get; internal set; }
 
         /// <summary>
+        /// Time the application should pause for.
+        /// </summary>
+        public static float PauseTimer { get; internal set; }
+
+        /// <summary>
+        /// Pauses the entire application for the given time.
+        /// </summary>
+        public static void PauseFor(float time)
+        {
+            if (time >= PauseTimer)
+                PauseTimer = time;
+        }
+
+        /// <summary>
         /// Returns true when the elapsed time passes a given interval based on the delta time
         /// </summary>
         public static bool OnInterval(double time, double delta, double interval, double offset)
@@ -92,6 +106,14 @@ namespace Foster.Framework
         public static bool OnInterval(double interval, double offset = 0.0)
         {
             return OnInterval(Duration.TotalSeconds, Delta, interval, offset);
+        }
+
+        /// <summary>
+        /// Returns true when the given timestamp is passed.
+        /// </summary>
+        public static bool OnTime(double time, double timestamp)
+        {
+            return time >= timestamp && time - Time.Delta < timestamp;
         }
 
         /// <summary>

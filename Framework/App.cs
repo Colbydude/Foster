@@ -224,6 +224,16 @@ namespace Foster.Framework
                     Modules.Update();
                 }
 
+                if (Time.PauseTimer > 0)
+                {
+                    Time.PauseTimer -= Time.Delta;
+
+                    if (Time.PauseTimer <= -0.0001f)
+                        Time.Delta = -Time.PauseTimer;
+                    else
+                        continue;
+                }
+
                 Modules.FrameEnd();
 
                 // Check if the Primary Window has been closed
