@@ -15,6 +15,9 @@ namespace Foster.Framework
         public static readonly Color Transparent = new Color(0, 0, 0, 0);
         public static readonly Color White = new Color(0xffffff);
         public static readonly Color Black = new Color(0x000000);
+        public static readonly Color LightGray = new Color(0xc0c0c0);
+        public static readonly Color Gray = new Color(0x808080);
+        public static readonly Color DarkGray = new Color(0x404040);
         public static readonly Color Red = new Color(0xff0000);
         public static readonly Color Green = new Color(0x00ff00);
         public static readonly Color Blue = new Color(0x0000ff);
@@ -89,6 +92,19 @@ namespace Foster.Framework
             A = (byte)(255 * alpha);
         }
 
+        /// <summary>
+        /// Creates a color given the uint32 RGBA data
+        /// </summary>
+        public Color(uint rgba)
+        {
+            ABGR = 0;
+
+            R = (byte)(rgba >> 24);
+            G = (byte)(rgba >> 16);
+            B = (byte)(rgba >> 08);
+            A = (byte)(rgba);
+        }
+
         public Color(byte r, byte g, byte b, byte a)
         {
             ABGR = 0;
@@ -132,6 +148,14 @@ namespace Foster.Framework
         public Vector4 ToVector4()
         {
             return new Vector4(R / 255f, G / 255f, B / 255f, A / 255f);
+        }
+
+        /// <summary>
+        /// Converts the Color to a Vector3
+        /// </summary>
+        public Vector3 ToVector3()
+        {
+            return new Vector3(R / 255f, G / 255f, B / 255f);
         }
 
         public override bool Equals(object? obj)
@@ -298,6 +322,15 @@ namespace Foster.Framework
         }
 
         /// <summary>
+        /// Implicitely converts an uint32 to a Color, ex 0xffffffff
+        /// </summary>
+        /// <param name="color"></param>
+        public static implicit operator Color(uint color)
+        {
+            return new Color(color);
+        }
+
+        /// <summary>
         /// Multiplies a Color by a scaler
         /// </summary>
         public static Color operator *(Color value, float scaler)
@@ -318,6 +351,26 @@ namespace Foster.Framework
         public static bool operator !=(Color a, Color b)
         {
             return a.ABGR != b.ABGR;
+        }
+
+        static public implicit operator Color(Vector4 vec)
+        {
+            return new Color(vec.X, vec.Y, vec.Z, vec.W);
+        }
+
+        static public implicit operator Color(Vector3 vec)
+        {
+            return new Color(vec.X, vec.Y, vec.Z, 1.0f);
+        }
+
+        static public implicit operator Vector4(Color col)
+        {
+            return col.ToVector4();
+        }
+
+        static public implicit operator Vector3(Color col)
+        {
+            return col.ToVector3();
         }
     }
 }

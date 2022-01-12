@@ -179,6 +179,8 @@ namespace Foster.Framework
             Height = h;
         }
 
+        public Rect(float w, float h) : this(0, 0, w, h) { }
+
         public Rect(Vector2 a, Vector2 b)
         {
             X = Math.Min(a.X, b.X);
@@ -319,9 +321,33 @@ namespace Foster.Framework
             return $"[{X}, {Y}, {Width}, {Height}]";
         }
 
+        public static Rect Between(Vector2 a, Vector2 b)
+        {
+            Rect rect;
+
+            rect.X = a.X < b.X ? a.X : b.X;
+            rect.Y = a.Y < b.Y ? a.Y : b.Y;
+            rect.Width = (a.X > b.X ? a.X : b.X) - rect.X;
+            rect.Height = (a.Y > b.Y ? a.Y : b.Y) - rect.Y;
+
+            return rect;
+        }
+
+        public static implicit operator Rect((float X, float Y, float Width, float Height) tuple) => new Rect(tuple.X, tuple.Y, tuple.Width, tuple.Height);
+
         public static implicit operator Rect(RectInt rect)
         {
             return new Rect(rect.X, rect.Y, rect.Width, rect.Height);
+        }
+
+        public static implicit operator Rect(Vector4 vec)
+        {
+            return new Rect(vec.X, vec.Y, vec.Z, vec.W);
+        }
+
+        public static implicit operator Vector4(Rect rect)
+        {
+            return new Vector4(rect.X, rect.Y, rect.Width, rect.Height);
         }
 
         public static bool operator ==(Rect a, Rect b)

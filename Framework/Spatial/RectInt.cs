@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Foster.Framework
@@ -173,6 +174,18 @@ namespace Foster.Framework
 
         #endregion
 
+        #region PointsF
+
+        public float CenterXF => X + Width * 0.5f;
+        public float CenterYF => Y + Height * 0.5f;
+        public Vector2 TopCenterF => new Vector2(CenterX, Top);
+        public Vector2 CenterLeftF => new Vector2(Left, CenterY);
+        public Vector2 CenterF => new Vector2(CenterX, CenterY);
+        public Vector2 CenterRightF => new Vector2(Right, CenterY);
+        public Vector2 BottomCenterF => new Vector2(CenterX, Bottom);
+
+        #endregion
+
         public RectInt(int x, int y, int w, int h)
         {
             X = x;
@@ -180,6 +193,8 @@ namespace Foster.Framework
             Width = w;
             Height = h;
         }
+
+        public RectInt(int w, int h) : this(0, 0, w, h) { }
 
         public RectInt(Point2 position, Point2 size)
         {
@@ -205,6 +220,14 @@ namespace Foster.Framework
         public bool Overlaps(in RectInt against)
         {
             return X + Width > against.X && Y + Height > against.Y && X < against.X + against.Width && Y < against.Y + against.Height;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public RectInt Conflate(in RectInt other)
+        {
+            var min = Point2.Min(Min, other.Min);
+            var max = Point2.Max(Max, other.Max);
+            return new RectInt(min.X, min.Y, max.X - min.X, max.Y - min.Y);
         }
 
         public RectInt Inflate(int by)
@@ -310,6 +333,24 @@ namespace Foster.Framework
         public RectInt RotateRight() => RotateRight(Point2.Zero);
         public RectInt RotateRight(int count) => RotateRight(Point2.Zero, count);
 
+        public RectInt GetSweep(Cardinal direction, int distance)
+        {
+            if (distance < 0)
+            {
+                distance *= -1;
+                direction = direction.Reverse;
+            }
+
+            if (direction == Cardinal.Right)
+                return new RectInt(X + Width, Y, distance, Height);
+            else if (direction == Cardinal.Left)
+                return new RectInt(X - distance, Y, distance, Height);
+            else if (direction == Cardinal.Down)
+                return new RectInt(X, Y + Height, Width, distance);
+            else
+                return new RectInt(X, Y - distance, Width, distance);
+        }
+
         public override bool Equals(object? obj) => (obj is RectInt other) && (this == other);
 
         public override int GetHashCode()
@@ -343,6 +384,8 @@ namespace Foster.Framework
 
             return rect;
         }
+
+        public static implicit operator RectInt((int X, int Y, int Width, int Height) tuple) => new RectInt(tuple.X, tuple.Y, tuple.Width, tuple.Height);
 
         public static bool operator ==(RectInt a, RectInt b)
         {

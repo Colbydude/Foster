@@ -1234,6 +1234,66 @@ namespace Foster.Framework
             PopMatrix();
         }
 
+        /// <summary>
+        /// Draw text on the baseline, scaled to match `size`.
+        /// For example: if the font was loaded at 10pt, and you set `size = 20`, the text will be scaled x2.
+        /// </summary>
+        public void Text(SpriteFont font, ReadOnlySpan<char> text, Vector2 position, int size, float rotation, Color color)
+        {
+            float s = size / (float)font.Size;
+            var scale = new Vector2(s, s);
+            var origin = new Vector2(0f, font.Ascent);
+            PushMatrix(position, scale, origin, rotation);
+            Text(font, text, color);
+            PopMatrix();
+        }
+
+        /// <summary>
+        /// Draw text on the baseline, scaled to match `size`.
+        /// For example: if the font was loaded at 10pt, and you set `size = 20`, the text will be scaled x2.
+        /// </summary>
+        public void Text(SpriteFont font, string text, Vector2 position, int size, float rotation, Color color)
+        {
+            float s = size / (float)font.Size;
+            var scale = new Vector2(s, s);
+            var origin = new Vector2(0f, font.Ascent);
+            PushMatrix(position, scale, origin, rotation);
+            Text(font, text.AsSpan(), color);
+            PopMatrix();
+        }
+
+        /// <summary>
+        /// Draws the text scaled to fit into the provided rectangle, never exceeding the max font size.
+        /// </summary>
+        public void TextFitted(SpriteFont font, string text, in Rect rect, float maxSize, Color color)
+        {
+            var textSpan = text.AsSpan();
+            var size = font.SizeOf(textSpan);
+            var sx = rect.Width / size.X;
+            var sy = rect.Height / font.Size;
+            var scale = Math.Min(maxSize / font.Size, Math.Min(sx, sy));
+            var pos = rect.Size * 0.5f - size * scale * 0.5f;
+            PushMatrix(Matrix3x2.CreateScale(scale) * Matrix3x2.CreateTranslation(pos));
+            Text(font, textSpan, color);
+            PopMatrix();
+        }
+
+        /// <summary>
+        /// Draws the text scaled to fit into the provided rectangle.
+        /// </summary>
+        public void TextFitted(SpriteFont font, string text, in Rect rect, Color color)
+        {
+            var textSpan = text.AsSpan();
+            var size = font.SizeOf(textSpan);
+            var sx = rect.Width / size.X;
+            var sy = rect.Height / font.Size;
+            var scale = Math.Min(sx, sy);
+            var pos = rect.Size * 0.5f - size * scale * 0.5f;
+            PushMatrix(Matrix3x2.CreateScale(scale) * Matrix3x2.CreateTranslation(pos));
+            Text(font, textSpan, color);
+            PopMatrix();
+        }
+
         #endregion
 
         #region Copy Arrays
